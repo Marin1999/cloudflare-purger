@@ -1,0 +1,20 @@
+{
+  "name": "cloudflare-purger",
+  "version": "1.0.0",
+  "description": "Small webhook server for purging Cloudflare homepage cache.",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "cloudflare",
+    "ghost",
+    "webhook",
+    "cache"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  }
+}
