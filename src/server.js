@@ -72,9 +72,11 @@ function verifyGhostSignature(rawBody, signatureHeader, secret) {
     return false;
   }
 
+  const timestamp = signatureParts.t;
+
   const expectedSignature = crypto
     .createHmac('sha256', secret)
-    .update(`${signatureParts.t}.${rawBody}`)
+    .update(rawBody + timestamp)
     .digest('hex');
 
   const receivedBuffer = Buffer.from(signatureParts.sha256, 'hex');
