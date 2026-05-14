@@ -1,14 +1,16 @@
-# Cloudflare Homepage Cache Purger
+# Cloudflare Cache Purger
 
-Small Node.js webhook server that verifies a Ghost webhook signature and purges the homepage URL from Cloudflare.
+Small Node.js webhook server that verifies a Ghost webhook signature and purges configured URLs from Cloudflare.
 
 ## What It Does
 
-When the server receives a valid `POST` request on the configured path, it calls the Cloudflare purge cache API for:
+When the server receives a valid `POST` request on the configured path, it calls the Cloudflare purge cache API for the URLs configured in `PURGE_URLS`.
 
 ```text
-SITE_URL/
+PURGE_URLS=/,/about/,/contact/
 ```
+
+When `PURGE_UPDATED_POST_URL=true`, the server also purges the updated post URL from the Ghost webhook payload when `post.current.url` or `post.current.slug` is present.
 
 ## Requirements
 
@@ -22,6 +24,8 @@ Copy `.env.example` and set these values:
 
 ```env
 SITE_URL=https://example.com
+PURGE_URLS=/,/about/,/contact/
+PURGE_UPDATED_POST_URL=false
 PURGE_PATH=/purge-cache
 PORT=3001
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
@@ -33,6 +37,9 @@ Notes:
 
 - `PORT` is optional and defaults to `3001`.
 - `SITE_URL` should not include a trailing slash.
+- `PURGE_URLS` is optional and defaults to `/`.
+- `PURGE_URLS` accepts comma-separated relative paths or full URLs.
+- `PURGE_UPDATED_POST_URL` is optional and defaults to `false`. Set it to `true` to purge the updated post URL from the webhook payload.
 - `PURGE_PATH` should begin with `/`.
 
 ## Run Locally
@@ -71,6 +78,8 @@ Run it:
 docker run --rm -p 3001:3001 \
   -e PORT=3001 \
   -e SITE_URL=https://example.com \
+  -e PURGE_URLS=/,/about/,/contact/ \
+  -e PURGE_UPDATED_POST_URL=false \
   -e PURGE_PATH=/purge-cache \
   -e CLOUDFLARE_API_TOKEN=your_token \
   -e CLOUDFLARE_ZONE_ID=your_zone_id \
@@ -80,7 +89,7 @@ docker run --rm -p 3001:3001 \
 
 ## Responses
 
-- `200 Homepage cache purged` for a successful purge
+- `200 Cache purged` for a successful purge
 - `401 Unauthorized` for an invalid or missing signature
 - `404 Not Found` for the wrong path
 - `405 Method Not Allowed` for non-`POST` requests
